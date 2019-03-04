@@ -1,0 +1,135 @@
+;
+;  LABELING END OF PROGRAM MODULE
+;		WRITTEN BY AKIE Sep.1983
+;
+ENDALL::
+;
+;ONLY THIS LABEL DEFININES
+;
+	END
+ееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееее	A,H
+	SBB	D
+	SUI	2
+	MOV	L,A
+	MVI	H,0
+	DAD	H
+	SHLD	BLOCKS
+;
+TRNSF:	LXI	D,FCB1
+	CALL	SETFCB
+	LXI	D,MES1
+	CALL	GETFN
+	ORA	A
+	JZ	TRNSF
+	LXI	D,FCB2
+	CALL	SETFCB
+	LXI	D,MES2
+	CALL	GETFN
+	ORA	A
+	JZ	TRNSF
+	MVI	C,13
+	CALL	BDOS
+	CALL	PRCRLF
+;
+	CALL	READBF
+	CALL	WRITBF
+;
+	LXI	D,MES3
+	CALL	PRSTR
+	CALL	CONIN
+	PUSH	PSW
+	CALL	PRCRLF
+	POP	PSW
+	CPI	20H
+	JZ	TRNSF
+	JMP	REBOOT
+;
+READBF::
+	LXI	D,FCB1
+	CALL	SETFCB
+	CALL	OPENER
+	ORA	A
+	JZ	0
+	LHLD	BLOCKS
+	LXI	B,0
+	LXI	D,ZZZZZZ
+RBF10:	PUSH	H
+	PUSH	D
+	PUSH	B
+	CALL	SETDMA
+	CALL	READ
+	POP	B
+	POP	D
+	POP	H
+	ORA	A
+	JZ	RBF20
+	DCX	H
+	MOV	A,L
+	ANA	H
+	INR	A
+	JZ	MEMOVR
+	INX	B
+	PUSH	H
+	LXI	H,128
+	DAD	D
+	XCHG
+	POP	H
+	JMP	RBF10
+;
+RBF20:	MOV	L,C
+	MOV	H,B
+	SHLD	BLOCKS
+	RET
+;
+MEMOVR::
+	LXI	D,MES4
+	CALL	PRSTR
+	JMP	REBOOT
+;
+WRITBF::
+	LXI	D,FCB2
+	CALL	SETFCB
+	CALL	MAKEER
+	ORA	A
+	JZ	REBOOT
+	LHLD	BLOCKS
+	LXI	D,ZZZZZZ
+WBF10:	PUSH	H
+	PUSH	D
+	CALL	SETDMA
+	CALL	WRITER
+	ORA	A
+	JZ	REBOOT
+	POP	D
+	LXI	H,128
+	DAD	D
+	XCHG
+	POP	H
+	DCX	H
+	MOV	A,L
+	ORA	H
+	JNZ	WBF10
+	CALL	CLOSER
+	ORA	A
+	JZ	REBOOT
+	RET
+;
+;
+MES1:	DB	'ENTER SOURCE FILE NAME:$'
+MES2:	DB	' DISTINATION FILE NAME:$'
+MES3:	DB	'PUSH SPACE BAR TO CONTINUE:$'
+MES4:	DB	'OUT OF MEMORY!!!$'
+;
+FCB1:	DS	32
+FCB2:	DS	32
+BLOCKS:	DS	2
+;
+ZZZZZZ::
+	END
+$'
+MES2:	DB	' DISTINATION FILE NAME:$'
+MES3:	DB	'PUSH SPACE BAR TO CONTINUE:$'
+MES4:	DB	'OUT OF MEMORY!!!$'
+;
+FCB1:	DS	32
+€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€
