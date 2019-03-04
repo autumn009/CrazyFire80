@@ -1,0 +1,2 @@
+# CrazyFire80
+CRAZY FIRE PART-1 for PC-8001
